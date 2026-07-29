@@ -12,6 +12,7 @@ import {
   MapPin,
   Menu,
   MessageCircle,
+  MousePointer2,
   ShieldCheck,
   Sparkles,
   Wrench,
@@ -26,6 +27,7 @@ import saleProof2 from './assets/sale-proof-2.webp'
 import scooterX15 from './assets/scooter-x15.webp'
 import { business } from './config'
 import { products } from './data'
+import { MotionMedia } from './components/MotionMedia'
 import { ProductCard } from './components/ProductCard'
 import { Reveal } from './components/Reveal'
 
@@ -40,21 +42,47 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [faqOpen, setFaqOpen] = useState<number | null>(0)
   const [scrollY, setScrollY] = useState(0)
+  const [scrollProgress, setScrollProgress] = useState(0)
 
   useEffect(() => {
     let frame = 0
     const onScroll = () => {
       cancelAnimationFrame(frame)
-      frame = requestAnimationFrame(() => setScrollY(window.scrollY))
+      frame = requestAnimationFrame(() => {
+        const y = window.scrollY
+        const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight)
+        setScrollY(y)
+        setScrollProgress(Math.min(1, y / maxScroll))
+      })
     }
+
+    onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+
     return () => {
       cancelAnimationFrame(frame)
       window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
     }
   }, [])
 
-  const heroTransform = useMemo(() => `translate3d(0, ${Math.min(scrollY * 0.12, 90)}px, 0) scale(1.06)`, [scrollY])
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : ''
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [menuOpen])
+
+  const heroTransform = useMemo(
+    () => `translate3d(0, ${Math.min(scrollY * 0.115, 96)}px, 0) scale(${1.08 + Math.min(scrollY / 12000, 0.035)})`,
+    [scrollY],
+  )
+
+  const heroContentTransform = useMemo(
+    () => `translate3d(0, ${Math.min(scrollY * -0.025, 0)}px, 0)`,
+    [scrollY],
+  )
 
   const faqs = [
     ['Preciso de habilitação?', 'As regras dependem da potência, velocidade e classificação do modelo. Antes da compra, nossa equipe orienta qual opção combina com seu uso e quais cuidados legais devem ser observados.'],
@@ -65,7 +93,8 @@ function App() {
 
   return (
     <div className="site-shell">
-      <header className="header">
+      <header className={`header ${scrollY > 24 ? 'is-scrolled' : ''}`}>
+        <span className="header__progress" style={{ transform: `scaleX(${scrollProgress})` }} aria-hidden="true" />
         <a href="#inicio" className="brand" aria-label="Alessandro Bike — início">
           <img src={logo} alt="Logo Alessandro Bike" />
           <span><strong>Alessandro</strong><small>Bike</small></span>
@@ -86,12 +115,22 @@ function App() {
 
       {menuOpen && (
         <div className="mobile-menu" role="dialog" aria-modal="true" aria-label="Menu">
+          <div className="mobile-menu__orb" aria-hidden="true" />
           <button onClick={() => setMenuOpen(false)} aria-label="Fechar menu"><X /></button>
-          <img src={logo} alt="Alessandro Bike" />
-          {nav.map(([label, href]) => (
-            <a key={href} href={href} onClick={() => setMenuOpen(false)}>{label}<ChevronRight /></a>
-          ))}
-          <a className="button button--yellow" href={business.whatsapp.main} target="_blank" rel="noreferrer">Chamar no WhatsApp</a>
+          <div className="mobile-menu__brand">
+            <img src={logo} alt="Alessandro Bike" />
+            <span>Mobilidade<br /><strong>em movimento.</strong></span>
+          </div>
+          <nav>
+            {nav.map(([label, href], index) => (
+              <a key={href} href={href} onClick={() => setMenuOpen(false)}>
+                <small>0{index + 1}</small><span>{label}</span><ChevronRight />
+              </a>
+            ))}
+          </nav>
+          <a className="button button--yellow" href={business.whatsapp.main} target="_blank" rel="noreferrer">
+            Chamar no WhatsApp <ArrowRight size={18} />
+          </a>
         </div>
       )}
 
@@ -101,18 +140,22 @@ function App() {
             <img src={heroStore} alt="Fachada e scooters da Alessandro Bike" />
           </div>
           <div className="hero__shade" />
+          <div className="hero__grid" aria-hidden="true" />
           <div className="hero__speed-lines" aria-hidden="true" />
+          <div className="hero__spotlight" aria-hidden="true" />
+          <div className="hero__orbit hero__orbit--one" aria-hidden="true" />
+          <div className="hero__orbit hero__orbit--two" aria-hidden="true" />
 
-          <div className="hero__content">
+          <div className="hero__content" style={{ transform: heroContentTransform }}>
             <Reveal>
-              <div className="hero__pill"><Zap size={14} /> Mobilidade elétrica com suporte de verdade</div>
-              <h1>Mais liberdade.<br /><span>Menos custo no caminho.</span></h1>
+              <div className="hero__pill"><Zap size={14} /> Especialistas em mobilidade elétrica</div>
+              <h1>Mais liberdade.<br /><span>Menos custo</span><br />no caminho.</h1>
               <p>Escolha sua bike elétrica ou scooter com orientação especializada, assistência técnica e atendimento perto de você.</p>
               <div className="hero__actions">
-                <a className="button button--yellow" href={business.whatsapp.main} target="_blank" rel="noreferrer">
+                <a className="button button--yellow button--premium" href={business.whatsapp.main} target="_blank" rel="noreferrer">
                   Encontrar meu modelo <ArrowRight size={18} />
                 </a>
-                <a className="button button--ghost" href="#modelos">Ver modelos</a>
+                <a className="button button--ghost" href="#modelos">Explorar modelos</a>
               </div>
               <div className="hero__trust">
                 <span><CheckCircle2 size={17} /> Venda orientada</span>
@@ -122,8 +165,14 @@ function App() {
             </Reveal>
           </div>
 
+          <div className="hero__floating-card" aria-hidden="true">
+            <span>ELÉTRICAS</span>
+            <strong>Venda + oficina</strong>
+            <small>Suporte antes e depois da compra</small>
+          </div>
+
           <a href="#modelos" className="scroll-cue" aria-label="Ver modelos">
-            <span>Descubra</span><ChevronDown />
+            <span>Deslize</span><ChevronDown />
           </a>
         </section>
 
@@ -134,11 +183,15 @@ function App() {
         </section>
 
         <section id="modelos" className="section products-section">
-          <Reveal className="section-heading">
-            <p className="eyebrow">Escolha com clareza</p>
-            <h2>Não é só uma elétrica.<br />É a que funciona para sua rotina.</h2>
+          <Reveal className="section-heading section-heading--split">
+            <div>
+              <p className="eyebrow">Showroom Alessandro Bike</p>
+              <h2>Escolha a elétrica que combina com o seu movimento.</h2>
+            </div>
             <p>Compare estilos e fale com a equipe para confirmar autonomia, disponibilidade, condições e o modelo ideal para o seu trajeto.</p>
           </Reveal>
+
+          <div className="mobile-swipe-hint"><MousePointer2 size={15} /> Arraste para explorar</div>
 
           <div className="product-grid">
             {products.map((product, index) => (
@@ -154,24 +207,26 @@ function App() {
           </Reveal>
         </section>
 
-        <section className="motion-banner">
+        <section className="motion-banner" aria-label="Categorias atendidas">
           <div className="motion-banner__track" aria-hidden="true">
-            <span>ELÉTRICAS</span><i>•</i><span>SCOOTERS</span><i>•</i><span>MOTORIZADAS</span><i>•</i><span>MANUTENÇÃO</span><i>•</i>
-            <span>ELÉTRICAS</span><i>•</i><span>SCOOTERS</span><i>•</i><span>MOTORIZADAS</span><i>•</i><span>MANUTENÇÃO</span><i>•</i>
+            <span>ELÉTRICAS</span><i>•</i><span>SCOOTERS</span><i>•</i><span>MOTORIZADAS</span><i>•</i><span>MOBILETES</span><i>•</i><span>MANUTENÇÃO</span><i>•</i>
+            <span>ELÉTRICAS</span><i>•</i><span>SCOOTERS</span><i>•</i><span>MOTORIZADAS</span><i>•</i><span>MOBILETES</span><i>•</i><span>MANUTENÇÃO</span><i>•</i>
           </div>
         </section>
 
         <section id="manutencao" className="section service-section">
           <div className="service-visual">
-            <Reveal className="service-visual__main">
+            <MotionMedia className="service-visual__main" strength={42}>
               <img src={serviceSpecialist} alt="Especialista da Alessandro Bike falando sobre manutenção" loading="lazy" />
+              <div className="service-visual__scan" aria-hidden="true" />
               <div className="service-visual__label"><Wrench /> Especialistas em elétricas</div>
-            </Reveal>
-            <div className="service-visual__card">
+            </MotionMedia>
+            <Reveal className="service-visual__card">
               <Gauge />
               <strong>Diagnóstico antes do reparo</strong>
               <span>Mais clareza sobre o que sua bike realmente precisa.</span>
-            </div>
+            </Reveal>
+            <span className="service-visual__word" aria-hidden="true">OFICINA</span>
           </div>
 
           <Reveal className="service-copy">
@@ -188,17 +243,18 @@ function App() {
         </section>
 
         <section id="diferenciais" className="proof-section">
-          <div className="proof-section__media">
+          <MotionMedia className="proof-section__media" strength={48}>
             <img src={scooterX15} alt="Scooter elétrica vermelha em exposição" loading="lazy" />
-          </div>
+          </MotionMedia>
           <div className="proof-section__overlay" />
+          <span className="proof-section__outline" aria-hidden="true">SUPORTE</span>
           <div className="proof-section__content section">
             <Reveal>
               <p className="eyebrow">Referência local</p>
               <h2>A compra não termina quando a scooter sai da loja.</h2>
               <p>O diferencial está em unir variedade, orientação, manutenção e uma relação próxima com quem escolheu rodar de um jeito novo.</p>
               <div className="metrics">
-                <div><strong>2</strong><span>unidades para atender</span></div>
+                <div><strong>2 unidades</strong><span>para atender você</span></div>
                 <div><strong>Venda + oficina</strong><span>tudo no mesmo lugar</span></div>
                 <div><strong>Atendimento humano</strong><span>antes e depois da compra</span></div>
               </div>
@@ -210,26 +266,30 @@ function App() {
           <Reveal className="section-heading section-heading--center">
             <p className="eyebrow">Gente satisfeita movimenta a marca</p>
             <h2>Entrega, relacionamento e histórias reais.</h2>
-            <p>A comunicação da Alessandro Bike já vive de proximidade, novidades e clientes. O site transforma essa confiança em um caminho mais fácil até o atendimento.</p>
+            <p>A proximidade que já acontece nas redes continua no atendimento, na entrega e no pós-venda.</p>
           </Reveal>
           <div className="community-grid">
-            <Reveal><img src={saleProof} alt="Registro de cliente e venda realizada" loading="lazy" /></Reveal>
-            <Reveal delay={100}><img src={saleProof2} alt="Registro de cliente satisfeito com scooter" loading="lazy" /></Reveal>
+            <Reveal><MotionMedia strength={24}><img src={saleProof} alt="Registro de cliente e venda realizada" loading="lazy" /></MotionMedia></Reveal>
+            <Reveal delay={100}><MotionMedia strength={-24}><img src={saleProof2} alt="Registro de cliente satisfeito com scooter" loading="lazy" /></MotionMedia></Reveal>
           </div>
           <a className="instagram-link" href={business.instagram} target="_blank" rel="noreferrer"><Instagram /> Acompanhar novidades no Instagram <ArrowRight /></a>
         </section>
 
         <section id="lojas" className="section locations-section">
-          <Reveal className="section-heading">
-            <p className="eyebrow">Perto de você</p>
-            <h2>Duas lojas. Um atendimento que entende sua escolha.</h2>
+          <Reveal className="section-heading section-heading--split">
+            <div>
+              <p className="eyebrow">Perto de você</p>
+              <h2>Duas lojas. Um atendimento que entende sua escolha.</h2>
+            </div>
+            <p>Abra a rota correta, fale com a equipe e confirme disponibilidade antes de sair.</p>
           </Reveal>
           <div className="locations-grid">
             <Reveal className="location-card">
+              <div className="location-card__number">01</div>
               <div className="location-card__icon"><MapPin /></div>
               <p className="eyebrow">Caraguatatuba</p>
               <h3>Loja Caraguá</h3>
-              <p>Av. Vereador Aristides Anísio dos Santos, 1072 — Indaiá.</p>
+              <p>{business.addresses.caragua}</p>
               <div className="location-card__hours"><Clock3 /> Seg. a sex. 8h30–18h · Sáb. 8h30–12h</div>
               <div className="location-card__actions">
                 <a href={business.whatsapp.caragua} target="_blank" rel="noreferrer">WhatsApp</a>
@@ -237,10 +297,11 @@ function App() {
               </div>
             </Reveal>
             <Reveal className="location-card location-card--yellow" delay={100}>
+              <div className="location-card__number">02</div>
               <div className="location-card__icon"><MapPin /></div>
               <p className="eyebrow">São José dos Campos</p>
               <h3>Loja São José</h3>
-              <p>Av. Pres. Tancredo Neves, 5592 — Parque Novo Horizonte.</p>
+              <p>{business.addresses.saoJose}</p>
               <div className="location-card__hours"><Clock3 /> Confirme o horário antes de sair</div>
               <div className="location-card__actions">
                 <a href={business.whatsapp.saoJose} target="_blank" rel="noreferrer">WhatsApp</a>
@@ -269,6 +330,7 @@ function App() {
 
         <section className="final-cta">
           <div className="final-cta__shape" aria-hidden="true" />
+          <div className="final-cta__lines" aria-hidden="true" />
           <Reveal>
             <Bike />
             <p className="eyebrow">Sua próxima mobilidade começa aqui</p>

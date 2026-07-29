@@ -1,46 +1,54 @@
 # Análise e direção do site
 
-## O que a comunicação atual transmite
+## O que a comunicação da Alessandro Bike transmite
 
-O material enviado mostra uma marca local, próxima e prática. Os principais padrões observados foram:
+O material original apresenta uma marca local, próxima e prática, com alguns sinais fortes:
 
-- identidade preta e amarela com alto contraste;
-- produtos como protagonistas das imagens;
+- identidade preta e amarela de alto contraste;
+- produtos como protagonistas;
 - comunicação direta sobre preço, potência e disponibilidade;
-- presença constante do proprietário/equipe, reforçando atendimento humano;
-- postagens de vendas realizadas e clientes satisfeitos;
-- autoridade em manutenção e alerta contra serviços sem especialização;
-- variedade ampla: elétricas, scooters, motorizadas, mobiletes, peças e oficina;
-- foco geográfico no Litoral Norte e Vale do Paraíba.
+- presença da equipe, reforçando atendimento humano;
+- clientes e vendas reais como prova social;
+- autoridade em manutenção especializada;
+- variedade entre elétricas, scooters, motorizadas, mobiletes, peças e oficina;
+- presença regional no Litoral Norte e Vale do Paraíba.
 
 ## Estratégia escolhida: conversão assistida
 
-A página não foi feita como uma campanha de atração pura, porque a empresa já possui público e investe em conteúdo. Também não foi feita como um catálogo agressivo de “compre agora”, porque scooters e bikes elétricas exigem orientação sobre uso, autonomia, suporte e manutenção.
+A empresa já possui público e investe em marketing. Por isso, o site não precisa agir somente como peça de atração. Ao mesmo tempo, uma bike ou scooter elétrica normalmente exige comparação, orientação, manutenção e segurança antes da decisão.
 
-O caminho escolhido foi:
+A página segue este caminho:
 
-1. atrair pela liberdade e economia;
-2. permitir descoberta e comparação visual dos modelos;
-3. reduzir insegurança usando oficina, pós-venda e atendimento local;
-4. mostrar prova social e proximidade;
-5. converter pelo WhatsApp com mensagens contextualizadas.
+1. impressiona e comunica profissionalismo;
+2. apresenta liberdade, economia e mobilidade;
+3. permite descoberta visual dos modelos;
+4. reduz risco por meio da oficina e do pós-venda;
+5. reforça proximidade com provas reais;
+6. converte pelo WhatsApp com mensagens contextualizadas.
 
-## Mobile-first, movimento e interação
+## Direção mobile-first de alto impacto
 
-- hero com parallax controlado pelo scroll;
-- faixa contínua em movimento;
-- entradas suaves por seção;
-- hover em cards apenas em dispositivos compatíveis;
-- CTA flutuante de WhatsApp;
-- menu móvel em tela cheia;
-- respeito a `prefers-reduced-motion`;
-- imagens otimizadas em WebP.
+A nova versão foi refeita com prioridade real para celulares:
 
-## Antes de publicar
+- hero de tela cheia com fotografia vertical;
+- parallax de baixo custo durante a rolagem;
+- camadas de grade, luz, órbitas e linhas de velocidade;
+- cards de benefícios e produtos com trilho horizontal e scroll-snap;
+- efeito 3D, brilho e hover somente onde o dispositivo suporta;
+- imagens com movimento independente em seções-chave;
+- menu mobile em tela cheia;
+- indicador de progresso de leitura;
+- CTA flutuante para WhatsApp;
+- animações reduzidas quando o usuário ativa `prefers-reduced-motion`.
 
-Confirme em `src/config.ts`:
+## Configurações centralizadas
 
-- número de WhatsApp de cada unidade;
-- horários atuais;
-- endereços;
-- produtos e preços em estoque.
+Em `src/config.ts` ficam:
+
+- o único número de WhatsApp utilizado em todo o site;
+- os textos de atendimento de cada contexto;
+- os endereços completos;
+- os links de rota para as duas lojas;
+- o Instagram.
+
+Isso evita números diferentes espalhados pelos componentes e facilita futuras alterações.

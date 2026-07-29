@@ -1,6 +1,6 @@
 # Alessandro Bike — site React
 
-Landing page mobile-first para vendas e manutenção de bicicletas elétricas, scooters e motorizadas.
+Landing page premium e mobile-first para venda e manutenção de bicicletas elétricas, scooters, motorizadas e mobiletes.
 
 ## Tecnologias
 
@@ -8,6 +8,9 @@ Landing page mobile-first para vendas e manutenção de bicicletas elétricas, s
 - Vite
 - CSS responsivo sem framework
 - Lucide React para ícones
+- parallax leve controlado por scroll
+- interações 3D e hover em dispositivos compatíveis
+- navegação horizontal mobile com scroll-snap
 
 ## Executar
 
@@ -22,24 +25,48 @@ npm run dev
 npm run build
 ```
 
-A pasta `dist/` gerada pode ser publicada no Netlify, Vercel ou hospedagem estática.
+A pasta `dist/` gerada pode ser publicada no Netlify, Vercel ou em qualquer hospedagem estática.
 
-## Onde alterar contatos
+## Alterar o WhatsApp
 
-Todos os links de WhatsApp, Instagram e mapas estão centralizados em:
+Todo o site utiliza um único número centralizado em:
 
 `src/config.ts`
 
-Antes de publicar, confirme os números e horários de cada unidade.
+Altere somente esta constante, mantendo DDI + DDD + número e usando apenas dígitos:
 
-## Direção comercial adotada
+```ts
+export const WHATSAPP_NUMBER = '5512988951423'
+```
 
-A página usa uma estratégia de conversão com atração suficiente para educar o visitante:
+Os textos enviados ao WhatsApp são montados automaticamente pela função `createWhatsAppLink`.
 
-1. benefício de mobilidade e economia;
-2. descoberta de modelos;
-3. redução de risco pela oficina e suporte local;
-4. prova social e proximidade;
-5. CTA recorrente para WhatsApp.
+## Localizações configuradas
 
-Os preços são apresentados como referência e acompanhados de aviso para confirmação de estoque e condições.
+### São José dos Campos
+
+Alessandro Bike — O Especialista em Bikes, Motorizadas, Elétricas e Mobiletes  
+Av. Pres. Tancredo Neves, 5592 — Parque Novo Horizonte, São José dos Campos — SP, 12225-731
+
+### Caraguatatuba
+
+Av. Ver. Aristides Anizio dos Santos, 1072 — Indaiá, Caraguatatuba — SP, 11665-150
+
+Os links de rota também ficam centralizados em `src/config.ts`.
+
+## Direção visual
+
+A versão foi desenhada prioritariamente para celular:
+
+1. hero em tela cheia com parallax e camadas de movimento;
+2. benefícios em trilho horizontal no mobile;
+3. showroom de produtos com scroll-snap;
+4. cards com profundidade, brilho e tilt no desktop;
+5. imagens com parallax leve durante a rolagem;
+6. faixas cinéticas e elementos de profundidade;
+7. CTA persistente para WhatsApp;
+8. suporte a `prefers-reduced-motion`.
+
+## Conteúdo comercial
+
+A página usa conversão assistida: apresenta os produtos, reduz inseguranças com oficina e pós-venda e leva o visitante ao atendimento no WhatsApp. Preços e disponibilidade devem ser confirmados com a loja antes da publicação.
