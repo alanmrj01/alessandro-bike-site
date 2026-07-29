@@ -3,9 +3,9 @@
  * Altere somente WHATSAPP_NUMBER para trocar o número usado em todo o site.
  * Formato: DDI + DDD + número, apenas dígitos.
  */
-export const WHATSAPP_NUMBER = '5512988951423'
+export const WHATSAPP_NUMBER = '5512991902163'
 
-export function createWhatsAppLink(message = 'Olá, vim pelo site da Alessandro Bike e quero atendimento.') {
+export function createWhatsAppLink(message = 'Olá, vim pelo site da Alessandro Bike e tenho interesse.') {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
 }
 
