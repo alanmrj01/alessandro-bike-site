@@ -12,9 +12,7 @@ import {
   MapPin,
   Menu,
   MessageCircle,
-  MousePointer2,
   ShieldCheck,
-  Sparkles,
   Wrench,
   X,
   Zap,
@@ -26,7 +24,7 @@ import saleProof from './assets/sale-proof.webp'
 import saleProof2 from './assets/sale-proof-2.webp'
 import scooterX15 from './assets/scooter-x15.webp'
 import { business } from './config'
-import { products } from './data'
+import { products, type ProductSegment } from './data'
 import { MotionMedia } from './components/MotionMedia'
 import { ProductCard } from './components/ProductCard'
 import { Reveal } from './components/Reveal'
@@ -38,11 +36,15 @@ const nav = [
   ['Lojas', '#lojas'],
 ] as const
 
+const productFilters = ['Todos', 'Bikes', 'Scooters', 'Triciclos', 'Patinetes'] as const
+type ProductFilter = (typeof productFilters)[number]
+
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [faqOpen, setFaqOpen] = useState<number | null>(0)
   const [scrollY, setScrollY] = useState(0)
   const [scrollProgress, setScrollProgress] = useState(0)
+  const [productFilter, setProductFilter] = useState<ProductFilter>('Todos')
 
   useEffect(() => {
     let frame = 0
@@ -82,6 +84,13 @@ function App() {
   const heroContentTransform = useMemo(
     () => `translate3d(0, ${Math.min(scrollY * -0.025, 0)}px, 0)`,
     [scrollY],
+  )
+
+  const filteredProducts = useMemo(
+    () => productFilter === 'Todos'
+      ? products
+      : products.filter((product) => product.segment === productFilter as ProductSegment),
+    [productFilter],
   )
 
   const faqs = [
@@ -191,20 +200,35 @@ function App() {
             <p>Compare estilos e fale com a equipe para confirmar autonomia, disponibilidade, condições e o modelo ideal para o seu trajeto.</p>
           </Reveal>
 
-          <div className="mobile-swipe-hint"><MousePointer2 size={15} /> Arraste para explorar</div>
+          <div className="catalog-toolbar">
+            <div className="catalog-toolbar__count">
+              <strong>{filteredProducts.length}</strong>
+              <span>{filteredProducts.length === 1 ? 'modelo selecionado' : 'modelos para explorar'}</span>
+            </div>
+            <div className="catalog-filters" role="group" aria-label="Filtrar catálogo por categoria">
+              {productFilters.map((filter) => (
+                <button
+                  key={filter}
+                  type="button"
+                  className={productFilter === filter ? 'is-active' : ''}
+                  onClick={() => setProductFilter(filter)}
+                  aria-pressed={productFilter === filter}
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
+          </div>
 
-          <div className="product-grid">
-            {products.map((product, index) => (
-              <Reveal key={product.name} delay={(index % 3) * 80}>
-                <ProductCard product={product} />
+
+          <div className="product-grid" key={productFilter}>
+            {filteredProducts.map((product, index) => (
+              <Reveal key={product.id} delay={(index % 3) * 80}>
+                <ProductCard product={product} index={index} total={filteredProducts.length} />
               </Reveal>
             ))}
           </div>
 
-          <Reveal className="catalog-cta">
-            <div><Sparkles /><span><strong>Estoque muda rápido.</strong> Receba as opções disponíveis hoje.</span></div>
-            <a href={business.whatsapp.main} target="_blank" rel="noreferrer">Abrir catálogo no WhatsApp <ArrowRight /></a>
-          </Reveal>
         </section>
 
         <section className="motion-banner" aria-label="Categorias atendidas">

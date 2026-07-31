@@ -3,9 +3,17 @@ import { ArrowUpRight, Check } from 'lucide-react'
 import type { Product } from '../data'
 import { createWhatsAppLink } from '../config'
 
-export function ProductCard({ product }: { product: Product }) {
+type ProductCardProps = {
+  product: Product
+  index: number
+  total: number
+}
+
+export function ProductCard({ product, index, total }: ProductCardProps) {
   const cardRef = useRef<HTMLElement>(null)
   const href = createWhatsAppLink(`Olá! Vi a ${product.name} no site e gostaria de confirmar disponibilidade e condições.`)
+  const position = String(index + 1).padStart(2, '0')
+  const amount = String(total).padStart(2, '0')
 
   const handlePointerMove = (event: PointerEvent<HTMLElement>) => {
     if (event.pointerType === 'touch') return
@@ -38,7 +46,22 @@ export function ProductCard({ product }: { product: Product }) {
       <div className="product-card__shine" aria-hidden="true" />
       <div className="product-card__media">
         {product.badge && <span className="product-card__badge">{product.badge}</span>}
-        <img src={product.image} alt={`${product.name} — ${product.category}`} loading="lazy" />
+        <span className="product-card__counter" aria-label={`Modelo ${index + 1} de ${total}`}>{position}<i>/</i>{amount}</span>
+        <img
+          className="product-card__backdrop"
+          src={product.image}
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          decoding="async"
+        />
+        <img
+          className="product-card__product"
+          src={product.image}
+          alt={`${product.name} — ${product.category}`}
+          loading="lazy"
+          decoding="async"
+        />
         <div className="product-card__glow" />
         <span className="product-card__index" aria-hidden="true">AB</span>
       </div>
@@ -52,7 +75,10 @@ export function ProductCard({ product }: { product: Product }) {
           ))}
         </div>
         <div className="product-card__footer">
-          <strong>{product.price}</strong>
+          <div className="product-card__price">
+            {product.oldPrice && <del>{product.oldPrice}</del>}
+            <strong>{product.price}</strong>
+          </div>
           <a href={href} target="_blank" rel="noreferrer" aria-label={`Consultar ${product.name} no WhatsApp`}>
             Consultar <ArrowUpRight size={17} />
           </a>
